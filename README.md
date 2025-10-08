@@ -61,11 +61,14 @@ Sumber Data: Kaggle: [NASA Asteroid Impacts](https://www.kaggle.com/datasets/nas
 
 ### Exploratory Data Analysis (EDA)
 1. Distribusi Diameter Asteroid
-Visualisasi distribusi `Asteroid Diameter (km)` menggunakan histogram menunjukkan bahwa sebagian besar asteroid yang terdeteksi memiliki diameter yang relatif kecil (di bawah 0.5 km). Namun, terdapat beberapa asteroid dengan ukuran yang jauh lebih besar (outliers) yang perlu diwaspadai karena potensi dampaknya yang lebih merusak.
+
+    Visualisasi distribusi `Asteroid Diameter (km)` menggunakan histogram menunjukkan bahwa sebagian besar asteroid yang terdeteksi memiliki diameter yang relatif kecil (di bawah 0.5 km). Namun, terdapat beberapa asteroid dengan ukuran yang jauh lebih besar (outliers) yang perlu diwaspadai karena potensi dampaknya yang lebih merusak.
 2. Perbandingan Karakteristik Asteroid Berbahaya vs. Tidak Berbahaya
-Dengan menggunakan target `is_hazardous` yang telah dibuat, kita bisa membandingkan karakteristik kedua kelompok. Misalnya, visualisasi box plot untuk `Minimum Orbit Intersection Distance (MOID)` menunjukkan bahwa kelompok asteroid yang diklasifikasikan sebagai "Berbahaya" memiliki nilai MOID yang secara signifikan lebih rendah dan lebih terkonsentrasi di dekat nol. Ini mengonfirmasi bahwa jarak orbit yang sangat dekat dengan orbit Bumi adalah faktor kunci dari sebuah ancaman.
+
+    Dengan menggunakan target `is_hazardous` yang telah dibuat, kita bisa membandingkan karakteristik kedua kelompok. Misalnya, visualisasi box plot untuk `Minimum Orbit Intersection Distance (MOID)` menunjukkan bahwa kelompok asteroid yang diklasifikasikan sebagai "Berbahaya" memiliki nilai MOID yang secara signifikan lebih rendah dan lebih terkonsentrasi di dekat nol. Ini mengonfirmasi bahwa jarak orbit yang sangat dekat dengan orbit Bumi adalah faktor kunci dari sebuah ancaman.
 3. Matriks Korelasi Antar Fitur
-Untuk memahami hubungan antar variabel numerik, dibuat sebuah heatmap dari matriks korelasi. Dari heatmap ini, terlihat adanya korelasi positif yang kuat antara `Orbit Axis` dan `Orbital Period`, yang sesuai dengan Hukum Kepler Ketiga. Selain itu, terlihat korelasi negatif antara `Asteroid Magnitude` dan `Asteroid Diameter`, yang mengonfirmasi bahwa asteroid yang lebih terang (magnitudo lebih kecil) cenderung berukuran lebih besar.
+
+    Untuk memahami hubungan antar variabel numerik, dibuat sebuah heatmap dari matriks korelasi. Dari heatmap ini, terlihat adanya korelasi positif yang kuat antara `Orbit Axis` dan `Orbital Period`, yang sesuai dengan Hukum Kepler Ketiga. Selain itu, terlihat korelasi negatif antara `Asteroid Magnitude` dan `Asteroid Diameter`, yang mengonfirmasi bahwa asteroid yang lebih terang (magnitudo lebih kecil) cenderung berukuran lebih besar.
 
 ## Data Preparation
 Tahap Data Preparation adalah salah satu proses paling krusial dalam proyek machine learning. Tujuannya adalah untuk membersihkan, mengubah, dan menstrukturkan data mentah agar siap digunakan untuk proses permodelan. Data yang bersih dan terstruktur dengan baik akan menghasilkan model yang lebih akurat dan andal.
