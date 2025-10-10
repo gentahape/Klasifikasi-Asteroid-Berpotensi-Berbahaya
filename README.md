@@ -85,7 +85,8 @@ Variabel-variabel yang terdapat pada dataset ini adalah sebagai berikut:
 
 Sebelum melakukan eksplorasi lebih dalam, langkah fundamental pertama adalah memeriksa kualitas dasar dari dataset. Proses ini mencakup pengecekan data yang hilang (missing values) dan data duplikat.
 
-[gambar_hasil_pengecekan_kualitas_data_disini]
+![Cek Missing Values](reports/cek-missing-values.png "Cek Missing Values")
+![Cek Duplikat Data](reports/cek-duplicate.png "Cek Duplikat Data")
 
 Hasil pemeriksaan menunjukkan bahwa dataset ini dalam kondisi sangat baik, di mana tidak ditemukan adanya data yang hilang (0 missing values) dan tidak ada baris data yang terduplikasi (0 duplicates). Kualitas data yang bersih ini memungkinkan kita untuk langsung melanjutkan ke tahap analisis tanpa perlu melakukan proses imputasi atau pembersihan data.
 
@@ -93,11 +94,22 @@ Hasil pemeriksaan menunjukkan bahwa dataset ini dalam kondisi sangat baik, di ma
 
 Tahap awal dalam memahami data adalah melakukan Exploratory Data Analysis (EDA). Salah satu fokus utama EDA pada proyek ini adalah untuk memahami distribusi data pada fitur-fitur numerik dan mengidentifikasi keberadaan outliers (pencilan). Outliers adalah data yang memiliki nilai ekstrem dan berpotensi memengaruhi kinerja model. Untuk tujuan ini, visualisasi dengan Box Plot digunakan.
 
-[gambar_hasil_pengecekan_outliers_disini]
+![Cek Outliers Fitur Numerik](reports/outliers-1.png "Fitur Numerik")
+![Cek Outliers Fitur Numerik](reports/outliers-2.png "Fitur Numerik")
+![Cek Outliers Fitur Numerik](reports/outliers-3.png "Fitur Numerik")
+![Cek Outliers Fitur Numerik](reports/outliers-4.png "Fitur Numerik")
+![Cek Outliers Fitur Numerik](reports/outliers-5.png "Fitur Numerik")
+![Cek Outliers Fitur Numerik](reports/outliers-6.png "Fitur Numerik")
+![Cek Outliers Fitur Numerik](reports/outliers-7.png "Fitur Numerik")
+![Cek Outliers Fitur Numerik](reports/outliers-8.png "Fitur Numerik")
+![Cek Outliers Fitur Numerik](reports/outliers-9.png "Fitur Numerik")
+![Cek Outliers Fitur Numerik](reports/outliers-10.png "Fitur Numerik")
+![Cek Outliers Fitur Numerik](reports/outliers-11.png "Fitur Numerik")
+![Cek Outliers Fitur Numerik](reports/outliers-12.png "Fitur Numerik")
 
 Dari visualisasi di atas, dapat diamati bahwa sebagian besar fitur numerik memiliki sejumlah outliers. Fitur `physical_activity_minutes_per_week` menunjukkan jumlah outliers yang paling signifikan di sisi atas, yang kemungkinan merepresentasikan individu yang sangat aktif. Keberadaan outliers ini menjadi pertimbangan penting untuk tahapan Data Preparation selanjutnya.
 
-[gambar_hasil_pengecekan_persentase_outliers_disini]
+![Cek Outliers Fitur Numerik menggunakan IQR](reports/outliers-iqr.png "Outliers IQR")
 
 Selain visualisasi, dilakukan juga kuantifikasi untuk menghitung jumlah dan persentase outliers secara numerik menggunakan metode Interquartile Range (IQR). Hasilnya mengkonfirmasi bahwa persentase outliers di sebagian besar fitur relatif rendah, umumnya di bawah 1% dari total data. Namun, fitur physical_activity_minutes_per_week menjadi pengecualian yang paling menonjol dengan persentase outliers mencapai 3.20%. Temuan ini memperkuat observasi dari box plot dan menjadi dasar pertimbangan dalam tahap Data Preparation untuk memutuskan strategi penanganan outliers yang tepat.
 
@@ -105,7 +117,7 @@ Selain visualisasi, dilakukan juga kuantifikasi untuk menghitung jumlah dan pers
 
 Untuk memahami hubungan linear antara fitur-fitur numerik, dibuat sebuah heatmap korelasi. Analisis ini penting untuk mengidentifikasi adanya multikolinearitas, yaitu kondisi di mana dua atau lebih variabel independen memiliki korelasi yang sangat tinggi. Multikolinearitas dapat mengganggu interpretasi model, terutama pada model linear seperti Regresi Logistik.
 
-[gambar_heatmap_korelasi_disini]
+![Heatmap Korelasi Fitur Numberik](reports/korelasi-fitur-numberik.png "Heatmap Korelasi Fitur Numberik")
 
 Dari heatmap di atas, dapat diamati beberapa korelasi positif yang kuat dan secara klinis dapat dijelaskan. Korelasi tertinggi ditemukan antara `hba1c` dan `glucose_postprandial` (0.93), serta `hba1c` dengan `glucose_fasting` (0.70). Hubungan ini sangat wajar karena HbA1c merupakan cerminan kadar glukosa darah jangka panjang. Selain itu, korelasi kuat juga terlihat antara `waist_to_hip_ratio` dan `bmi` (0.77), yang keduanya merupakan indikator obesitas.
 
@@ -177,6 +189,12 @@ Empat algoritma klasifikasi dipilih untuk dievaluasi:
 
 Semua model dilatih menggunakan data pelatihan yang telah dipersiapkan. Hasil evaluasi awal menunjukkan bahwa model ensemble (XGBoost dan LightGBM) secara signifikan mengungguli model dasar (KNN dan Regresi Logistik).
 
+![Evaluasi Model K-Nearest Neighbors](reports/evaluation-knn.png "Evaluasi Model K-Nearest Neighbors")
+![Evaluasi Model Logistic Regression](reports/evaluation-lr.png "Evaluasi Model Logistic Regression")
+![Evaluasi Model XGBoost Classifier](reports/evaluation-xgb.png "Evaluasi Model XGBoost Classifier")
+![Evaluasi Model LightGBM Classifier](reports/evaluation-lgb.png "Evaluasi Model LightGBM Classifier")
+![Evaluasi Model Akurasi](reports/evaluation-accuracy.png "Evaluasi Model Akurasi")
+
 Meskipun XGBoost dan LightGBM memiliki skor F1-Score yang identik (0.92), LightGBM dipilih sebagai model final. Keputusan ini didasarkan pada keunggulan kritisnya pada metrik Recall. LightGBM berhasil mencapai Recall sempurna (1.00) untuk kelas 'Pre-Diabetes' dan 'Diabetes', yang berarti model ini mampu mengidentifikasi semua kasus positif tanpa ada yang terlewat. Dalam konteks medis, kemampuan untuk meminimalkan false negatives ini jauh lebih berharga daripada sedikit peningkatan pada metrik lain.
 
 ### Peningkatan Model dengan Hyperparameter Tuning
@@ -190,7 +208,7 @@ Parameter terbaik yang ditemukan adalah sebagai berikut:
 - `n_estimators`: 200
 - `num_leaves`: 15
 
-[gambar_hasil_hyperparameter_tuning_disini]
+![Hasil Hyperparameter Tuning](reports/hyperparameter-tuning.png "Hasil Hyperparameter Tuning")
 
 Model akhir yang digunakan adalah model LightGBM dengan konfigurasi parameter optimal ini, yang terbukti memberikan skor F1 cross-validation sebesar 0.9205.
 
@@ -198,7 +216,7 @@ Model akhir yang digunakan adalah model LightGBM dengan konfigurasi parameter op
 
 Salah satu output paling berharga dari model berbasis pohon adalah kemampuannya untuk mengukur pentingnya setiap fitur. Analisis feature importance dilakukan pada model LightGBM yang telah dioptimalkan untuk mengidentifikasi prediktor paling signifikan.
 
-[gambar_hasil_feature_importance_disini]
+![Fitur Penting](reports/feature-important.png "Fitur Penting")
 
 Hasil analisis menunjukkan bahwa `glucose_fasting` (gula darah puasa) adalah fitur yang paling berpengaruh, diikuti oleh `age`, `physical_activity_minutes_per_week`, dan `hba1c`. Temuan ini sangat relevan secara klinis dan menegaskan bahwa indikator glikemik dan faktor gaya hidup adalah kunci utama dalam prediksi tahapan diabetes.
 
@@ -219,25 +237,25 @@ Metrik utama yang digunakan untuk mengevaluasi model adalah Confusion Matrix bes
 
 - Precision: Mengukur tingkat akurasi dari prediksi positif. Metrik ini menjawab pertanyaan: "Dari semua pasien yang diprediksi menderita diabetes, berapa persen yang benar-benar menderita diabetes?"
 
-[gambar_rumus]
+![Rumus Precision](datas/precision.png "Rumus Precision")
 
 Precision yang tinggi menunjukkan rendahnya tingkat alarm palsu (false positive).
 
 - Recall (Sensitivity): Mengukur kemampuan model untuk menemukan semua kasus positif yang relevan. Metrik ini menjawab pertanyaan: "Dari semua pasien yang sebenarnya menderita diabetes, berapa persen yang berhasil ditemukan oleh model?"
 
-[gambar_rumus]
+![Rumus Recall](datas/recall.png "Rumus Recall")
 
 Recall yang tinggi sangat krusial dalam proyek ini, karena menunjukkan kemampuan model untuk meminimalkan kasus yang terlewat (false negative).
 
 - F1-Score: Merupakan rata-rata harmonik dari Precision dan Recall. Metrik ini memberikan skor tunggal yang menyeimbangkan kedua metrik tersebut, sangat berguna ketika terdapat trade-off antara Precision dan Recall.
 
-[gambar_rumus]
+![Rumus F1-Score](datas/f1-score.png "Rumus F1-Score")
 
 ### Hasil Evaluasi Final
 
 Berikut adalah laporan klasifikasi (classification report) dari model LightGBM yang telah dioptimalkan saat diuji pada data uji:
 
-[gambar_hasil_evaluasi_final_disini]
+![Evaluasi Final](reports/evaluation-final.png "Evaluasi Final")
 
 Analisis dari hasil evaluasi menunjukkan performa yang sangat memuaskan:
 
