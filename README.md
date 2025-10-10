@@ -147,7 +147,7 @@ Variabel target asli, `diabetes_stage`, memiliki lima kategori. Untuk menyederha
 Model machine learning memerlukan input dalam format numerik. Oleh karena itu, semua fitur kategorikal diubah menggunakan dua teknik:
 
 - One-Hot Encoding: Diterapkan pada fitur nominal (yang tidak memiliki urutan) seperti `gender`, `ethnicity`, dan `smoking_status`. Teknik ini mengubah setiap kategori menjadi kolom biner baru untuk menghindari asumsi urutan yang salah oleh model.
-- Label Encoding: Diterapkan pada fitur ordinal (yang memiliki urutan) seperti `education_level` dan `income_level`, serta pada variabel target diabetes_stage yang telah direklasifikasi. Ini mengubah kategori menjadi nilai numerik berurutan (0, 1, 2).
+- Label Encoding: Diterapkan pada fitur ordinal (yang memiliki urutan) seperti `education_level` dan `income_level`, serta pada variabel target `diabetes_stage` yang telah direklasifikasi. Ini mengubah kategori menjadi nilai numerik berurutan (0, 1, 2).
 
 ### Pembagian Dataset (Train-Test Split)
 
@@ -203,12 +203,12 @@ Untuk memaksimalkan potensi LightGBM, dilakukan proses hyperparameter tuning men
 
 Parameter terbaik yang ditemukan adalah sebagai berikut:
 
+![Hasil Hyperparameter Tuning](reports/hyperparameter-tuning.png "Hasil Hyperparameter Tuning")
+
 - `learning_rate`: 0.01
 - `max_depth`: 5
 - `n_estimators`: 200
 - `num_leaves`: 15
-
-![Hasil Hyperparameter Tuning](reports/hyperparameter-tuning.png "Hasil Hyperparameter Tuning")
 
 Model akhir yang digunakan adalah model LightGBM dengan konfigurasi parameter optimal ini, yang terbukti memberikan skor F1 cross-validation sebesar 0.9205.
 
