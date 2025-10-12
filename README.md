@@ -43,7 +43,7 @@ Untuk mencapai tujuan tersebut, diajukan pendekatan solusi yang sistematis dan t
 
 ## Data Understanding
 
-Data yang digunakan dalam proyek ini merupakan dataset komprehensif yang berisi 100.000 catatan pasien dengan berbagai atribut terkait demografi, gaya hidup, riwayat medis, dan hasil pengukuran klinis. Dataset ini didapat dari situs Kaggle yang berjudul [Diabetes Health Indicators Dataset](https://www.kaggle.com/datasets/mohankrishnathalla/diabetes-health-indicators-dataset/data).
+Data yang digunakan dalam proyek ini merupakan dataset komprehensif yang secara total terdiri dari 100.000 baris (catatan pasien) dan 31 kolom (atribut). Dataset ini berisi berbagai atribut terkait demografi, gaya hidup, riwayat medis, dan hasil pengukuran klinis. Sumber data diperoleh dari platform Kaggle dengan judul [Diabetes Health Indicators Dataset](https://www.kaggle.com/datasets/mohankrishnathalla/diabetes-health-indicators-dataset/data).
 
 ### Deskripsi Variabel
 
@@ -134,10 +134,6 @@ Meskipun hasil EDA menunjukkan adanya outliers pada beberapa fitur numerik, dipu
 - Outliers tersebut dianggap sebagai data yang valid dan berpotensi memuat informasi klinis penting (misalnya, individu yang sangat aktif atau memiliki kadar glukosa ekstrem) 
 - Model-model ensemble canggih seperti XGBoost dan LightGBM yang menjadi fokus utama proyek ini secara inheren bersifat robust atau tahan terhadap outliers.
 
-### Penanganan Data Leakage
-
-Selama analisis awal, teridentifikasi dua fitur yang berpotensi menyebabkan kebocoran data (data leakage), yaitu `diabetes_risk_score` dan `diagnosed_diabetes`. Fitur-fitur ini mengandung informasi yang secara langsung atau tidak langsung berasal dari variabel target (`diabetes_stage`), sehingga dapat menciptakan akurasi model yang sangat tinggi secara artifisial namun tidak realistis. Untuk memastikan model belajar dari prediktor yang valid, kedua fitur ini dihapus dari dataset.
-
 ### Reklasifikasi Variabel Target
 
 Variabel target asli, `diabetes_stage`, memiliki lima kategori. Untuk menyederhanakan masalah sesuai dengan tujuan proyek, dilakukan reklasifikasi menjadi tiga kategori utama yang merepresentasikan progresi penyakit: 'No Diabetes', 'Pre-Diabetes', dan 'Diabetes'. Kategori 'Type 1', 'Type 2', dan 'Gestational' digabungkan menjadi satu kelas 'Diabetes'.
@@ -146,8 +142,12 @@ Variabel target asli, `diabetes_stage`, memiliki lima kategori. Untuk menyederha
 
 Model machine learning memerlukan input dalam format numerik. Oleh karena itu, semua fitur kategorikal diubah menggunakan dua teknik:
 
-- One-Hot Encoding: Diterapkan pada fitur nominal (yang tidak memiliki urutan) seperti `gender`, `ethnicity`, dan `smoking_status`. Teknik ini mengubah setiap kategori menjadi kolom biner baru untuk menghindari asumsi urutan yang salah oleh model.
+- One-Hot Encoding: Diterapkan pada fitur nominal (yang tidak memiliki urutan) seperti `gender`, `ethnicity`, `employment_status`, dan `smoking_status`. Teknik ini mengubah setiap kategori menjadi kolom biner baru untuk menghindari asumsi urutan yang salah oleh model.
 - Label Encoding: Diterapkan pada fitur ordinal (yang memiliki urutan) seperti `education_level` dan `income_level`, serta pada variabel target `diabetes_stage` yang telah direklasifikasi. Ini mengubah kategori menjadi nilai numerik berurutan (0, 1, 2).
+
+### Penanganan Data Leakage
+
+Selama analisis awal, teridentifikasi dua fitur yang berpotensi menyebabkan kebocoran data (data leakage), yaitu `diabetes_risk_score` dan `diagnosed_diabetes`. Fitur-fitur ini mengandung informasi yang secara langsung atau tidak langsung berasal dari variabel target (`diabetes_stage`), sehingga dapat menciptakan akurasi model yang sangat tinggi secara artifisial namun tidak realistis. Untuk memastikan model belajar dari prediktor yang valid, kedua fitur ini dihapus dari dataset.
 
 ### Pembagian Dataset (Train-Test Split)
 
@@ -159,31 +159,82 @@ Untuk memastikan bahwa fitur dengan skala numerik yang besar tidak mendominasi p
 
 ## Modeling
 
-Tahap pemodelan adalah inti dari proyek ini, di mana data yang telah dipersiapkan digunakan untuk melatih dan mengoptimalkan model machine learning. Pendekatan yang digunakan adalah melakukan analisis komparatif terhadap empat algoritma yang berbeda, mulai dari model dasar hingga model ensemble canggih, untuk menemukan solusi terbaik.
+Tahap pemodelan adalah inti dari proyek ini, di mana data yang telah dipersiapkan digunakan untuk melatih model machine learning. Pendekatan yang digunakan adalah melakukan analisis komparatif terhadap empat algoritma yang berbeda, mulai dari model dasar hingga model ensemble canggih, untuk menemukan solusi terbaik.
 
 ### Algoritma yang Digunakan
 
-Empat algoritma klasifikasi dipilih untuk dievaluasi:
+Empat algoritma klasifikasi dipilih untuk dievaluasi. Setiap model dilatih menggunakan parameter spesifik, baik yang diatur secara eksplisit maupun yang merupakan pengaturan bawaan (default) dari library `scikit-learn`.
 
 - K-Nearest Neighbors (KNN): Sebuah algoritma non-parametrik sederhana yang mengklasifikasikan data baru berdasarkan mayoritas kelas dari 'tetangga' terdekatnya.
     
     - Kelebihan: Mudah diimplementasikan dan diinterpretasikan.
     - Kekurangan: Sensitif terhadap skala data, komputasi bisa menjadi lambat pada dataset besar, dan performanya menurun jika terdapat banyak fitur yang tidak relevan.
+    - Parameter yang Digunakan: 
+        - `n_neighbors`: 5
+        - `weights`: 'uniform' 
+        - `algorithm`: 'auto'
 
 - Regresi Logistik (Logistic Regression): Model linear yang populer untuk masalah klasifikasi biner dan multikelas. Model ini menghitung probabilitas sebuah data masuk ke dalam kelas tertentu.
 
     - Kelebihan: Efisien secara komputasi, sangat mudah diinterpretasikan, dan memberikan output probabilitas.
     - Kekurangan: Mengasumsikan hubungan linear antara fitur dan log-odds dari target, serta bisa kurang akurat untuk masalah yang kompleks.
+    - Parameter yang Digunakan:
+        - `multi_class`: 'multinomial'
+        - `solver`: 'lbfgs'
+        - `max_iter`: 1000
+        - `penalty`: 'l2'
 
 - XGBoost (Extreme Gradient Boosting): Sebuah implementasi gradient boosting yang sangat dioptimalkan. Model ini membangun serangkaian decision tree secara sekuensial, di mana setiap pohon baru mencoba memperbaiki kesalahan dari pohon sebelumnya.
 
     - Kelebihan: Performa prediktif yang sangat tinggi, memiliki regularisasi internal untuk mencegah overfitting, dan fleksibel.
     - Kekurangan: Lebih kompleks untuk di-tuning dan memerlukan lebih banyak sumber daya komputasi dibandingkan model dasar.
+    - Parameter yang Digunakan:
+        - `use_label_encoder`: False
+        - `eval_metric`: 'mlogloss'
+        - `random_state`: 42
+        - `n_estimators`: 100
+        - `learning_rate`: 0.1
+        - `max_depth`: 6
 
 - LightGBM (Light Gradient Boosting Machine): Varian lain dari gradient boosting yang menggunakan teknik pertumbuhan pohon berbasis daun (leaf-wise) bukan berbasis level (level-wise) seperti XGBoost.
 
     - Kelebihan: Kecepatan pelatihan yang sangat tinggi dan penggunaan memori yang lebih efisien, seringkali dengan akurasi yang setara atau bahkan lebih baik dari XGBoost pada dataset besar.
     - Kekurangan: Bisa rentan terhadap overfitting pada dataset kecil jika parameternya tidak di-tuning dengan baik.
+    - Parameter yang Digunakan:
+        - `n_estimators`: 100
+        - `learning_rate`: 0.1
+        - `num_leaves`: 31
+
+## Evaluation
+
+Tahap evaluasi bertujuan untuk mengukur performa model final secara objektif pada data yang belum pernah dilihat sebelumnya. Pada tahap ini, model LightGBM yang telah dioptimalkan diuji menggunakan testing set (20% dari total data). Metrik evaluasi yang digunakan dipilih secara saksama agar sesuai dengan konteks masalah klasifikasi medis, di mana konsekuensi dari kesalahan prediksi harus dipertimbangkan.
+
+### Metrik Evaluasi
+
+Metrik utama yang digunakan untuk mengevaluasi model adalah Confusion Matrix beserta turunan-turunannya: Precision, Recall, dan F1-Score.
+
+- Confusion Matrix: Ini adalah tabel yang merangkum hasil prediksi model dengan membandingkannya dengan kelas aktual. Tabel ini menjadi dasar untuk menghitung metrik lainnya dan terdiri dari empat komponen utama:
+
+    - True Positive (TP): Pasien dengan diabetes yang diprediksi benar sebagai penderita diabetes.
+    - True Negative (TN): Pasien sehat yang diprediksi benar sebagai sehat.
+    - False Positive (FP): Pasien sehat yang salah diprediksi sebagai penderita diabetes (Kesalahan Tipe I).
+    - False Negative (FN): Pasien dengan diabetes yang salah diprediksi sebagai sehat (Kesalahan Tipe II). Dalam konteks medis, ini adalah kesalahan paling kritis yang harus diminimalkan.
+
+- Precision: Mengukur tingkat akurasi dari prediksi positif. Metrik ini menjawab pertanyaan: "Dari semua pasien yang diprediksi menderita diabetes, berapa persen yang benar-benar menderita diabetes?"
+
+![Rumus Precision](datas/precision.png "Rumus Precision")
+
+Precision yang tinggi menunjukkan rendahnya tingkat alarm palsu (false positive).
+
+- Recall (Sensitivity): Mengukur kemampuan model untuk menemukan semua kasus positif yang relevan. Metrik ini menjawab pertanyaan: "Dari semua pasien yang sebenarnya menderita diabetes, berapa persen yang berhasil ditemukan oleh model?"
+
+![Rumus Recall](datas/recall.png "Rumus Recall")
+
+Recall yang tinggi sangat krusial dalam proyek ini, karena menunjukkan kemampuan model untuk meminimalkan kasus yang terlewat (false negative).
+
+- F1-Score: Merupakan rata-rata harmonik dari Precision dan Recall. Metrik ini memberikan skor tunggal yang menyeimbangkan kedua metrik tersebut, sangat berguna ketika terdapat trade-off antara Precision dan Recall.
+
+![Rumus F1-Score](datas/f1-score.png "Rumus F1-Score")
 
 ### Pemilihan Model Terbaik
 
@@ -220,37 +271,6 @@ Salah satu output paling berharga dari model berbasis pohon adalah kemampuannya 
 
 Hasil analisis menunjukkan bahwa `glucose_fasting` (gula darah puasa) adalah fitur yang paling berpengaruh, diikuti oleh `age`, `physical_activity_minutes_per_week`, dan `hba1c`. Temuan ini sangat relevan secara klinis dan menegaskan bahwa indikator glikemik dan faktor gaya hidup adalah kunci utama dalam prediksi tahapan diabetes.
 
-## Evaluation
-
-Tahap evaluasi bertujuan untuk mengukur performa model final secara objektif pada data yang belum pernah dilihat sebelumnya. Pada tahap ini, model LightGBM yang telah dioptimalkan diuji menggunakan testing set (20% dari total data). Metrik evaluasi yang digunakan dipilih secara saksama agar sesuai dengan konteks masalah klasifikasi medis, di mana konsekuensi dari kesalahan prediksi harus dipertimbangkan.
-
-### Metrik Evaluasi
-
-Metrik utama yang digunakan untuk mengevaluasi model adalah Confusion Matrix beserta turunan-turunannya: Precision, Recall, dan F1-Score.
-
-- Confusion Matrix: Ini adalah tabel yang merangkum hasil prediksi model dengan membandingkannya dengan kelas aktual. Tabel ini menjadi dasar untuk menghitung metrik lainnya dan terdiri dari empat komponen utama:
-
-    - True Positive (TP): Pasien dengan diabetes yang diprediksi benar sebagai penderita diabetes.
-    - True Negative (TN): Pasien sehat yang diprediksi benar sebagai sehat.
-    - False Positive (FP): Pasien sehat yang salah diprediksi sebagai penderita diabetes (Kesalahan Tipe I).
-    - False Negative (FN): Pasien dengan diabetes yang salah diprediksi sebagai sehat (Kesalahan Tipe II). Dalam konteks medis, ini adalah kesalahan paling kritis yang harus diminimalkan.
-
-- Precision: Mengukur tingkat akurasi dari prediksi positif. Metrik ini menjawab pertanyaan: "Dari semua pasien yang diprediksi menderita diabetes, berapa persen yang benar-benar menderita diabetes?"
-
-![Rumus Precision](datas/precision.png "Rumus Precision")
-
-Precision yang tinggi menunjukkan rendahnya tingkat alarm palsu (false positive).
-
-- Recall (Sensitivity): Mengukur kemampuan model untuk menemukan semua kasus positif yang relevan. Metrik ini menjawab pertanyaan: "Dari semua pasien yang sebenarnya menderita diabetes, berapa persen yang berhasil ditemukan oleh model?"
-
-![Rumus Recall](datas/recall.png "Rumus Recall")
-
-Recall yang tinggi sangat krusial dalam proyek ini, karena menunjukkan kemampuan model untuk meminimalkan kasus yang terlewat (false negative).
-
-- F1-Score: Merupakan rata-rata harmonik dari Precision dan Recall. Metrik ini memberikan skor tunggal yang menyeimbangkan kedua metrik tersebut, sangat berguna ketika terdapat trade-off antara Precision dan Recall.
-
-![Rumus F1-Score](datas/f1-score.png "Rumus F1-Score")
-
 ### Hasil Evaluasi Final
 
 Berikut adalah laporan klasifikasi (classification report) dari model LightGBM yang telah dioptimalkan saat diuji pada data uji:
@@ -262,6 +282,17 @@ Analisis dari hasil evaluasi menunjukkan performa yang sangat memuaskan:
 - Performa Keseluruhan: Model mencapai `weighted avg f1-score` sebesar 0.92, yang menandakan bahwa model memiliki keseimbangan yang sangat baik antara Precision dan Recall di ketiga kelas.
 - Keunggulan Utama: Poin terpenting dari hasil ini adalah nilai Recall yang sempurna (1.00) untuk kelas 'Pre-Diabetes' dan 'Diabetes'. Ini berarti model berhasil mengidentifikasi SEMUA individu dengan kondisi pre-diabetes dan diabetes di dalam data uji, secara efektif mengeliminasi kesalahan false negative untuk kelas-kelas kritis ini.
 - Trade-off yang Dapat Diterima: Untuk mencapai Recall yang sempurna, model mengorbankan sedikit Precision (0.86 untuk Pre-Diabetes dan 0.83 untuk Diabetes). Ini berarti ada beberapa kasus false positive (pasien sehat yang ditandai berisiko). Dalam konteks skrining kesehatan, trade-off ini sangat dapat diterima karena memprioritaskan deteksi semua kasus potensial untuk ditinjau lebih lanjut oleh tenaga medis.
+
+Hasil evaluasi ini juga secara langsung menjawab setiap poin yang telah dirumuskan pada tahap Business Understanding, yaitu:
+
+- Analisis komparatif menunjukkan bahwa LightGBM adalah model dengan keandalan klinis terbaik, dibuktikan dengan kemampuannya mencapai recall 100% pada kelas 'Pre-Diabetes' dan 'Diabetes', yang merupakan tahap kritis untuk intervensi.
+- Analisis feature importance dari model LightGBM berhasil mengukur dan menyajikan peringkat faktor paling berpengaruh, dengan `glucose_fasting`, `age`, dan `hba1c` sebagai tiga teratas.
+- Hasil evaluasi secara kuantitatif menunjukkan bahwa model gradient boosting (LightGBM dengan F1-score 0.92) memberikan peningkatan performa yang sangat signifikan dibandingkan Regresi Logistik (F1-score 0.82) dan KNN (F1-score 0.71), sehingga membenarkan penggunaannya.
+- Model LightGBM berhasil diidentifikasi sebagai yang terbaik setelah evaluasi menyeluruh, dengan fokus pada metrik F1-Score dan Recall yang tinggi untuk kelas-kelas kritis.
+- Peringkat fitur-fitur paling berpengaruh berhasil disajikan melalui analisis feature importance.
+- Perbandingan kinerja antara model dasar dan canggih telah dilakukan dan didokumentasikan, memberikan justifikasi yang kuat untuk pemilihan model akhir.
+- Keempat algoritma telah diimplementasikan, dan evaluasi menggunakan Classification Report dan Confusion Matrix berhasil digunakan untuk memilih kandidat model terbaik.
+- Proses hyperparameter tuning pada LightGBM telah dilakukan, dan model yang dioptimalkan telah diinterpretasikan melalui feature importance. Keberhasilan solusi ini divalidasi oleh skor F1-Score akhir sebesar 0.92 pada data uji.
 
 ## Kesimpulan
 
